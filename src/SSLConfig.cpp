@@ -1,6 +1,7 @@
 #include "mbedtlscpp/SSLConfig.h"
 
 #include "mbedtlscpp/X509Crt.h"
+#include "mbedtlscpp/PKContext.h"
 #include "mbedtlscpp/CtrDRBGContext.h"
 #include "mbedtlscpp/mbedtls_error_category.h"
 
@@ -48,6 +49,19 @@ void mbedtlscpp::SSLConfig::defaults( Endpoint endpoint, Transport transport, Pr
 void mbedtlscpp::SSLConfig::caChain( mbedtlscpp::X509Crt& certificateChain, mbedtls_x509_crl* pRevocationList )
 {
 	mbedtls_ssl_conf_ca_chain( &context_, &certificateChain.context_, pRevocationList );
+}
+
+void mbedtlscpp::SSLConfig::ownCert( mbedtlscpp::X509Crt& ownCertificate, mbedtlscpp::PKContext& privateKey, std::error_code& error )
+{
+	int result=mbedtls_ssl_conf_own_cert( &context_, &ownCertificate.context_, &privateKey.context_ );
+	if( result!=0 ) error.assign( result, mbedtls_error_category::instance() );
+}
+
+void mbedtlscpp::SSLConfig::ownCert( mbedtlscpp::X509Crt& ownCertificate, mbedtlscpp::PKContext& privateKey )
+{
+	std::error_code error;
+	ownCert( ownCertificate, privateKey, error );
+	if( error ) throw std::system_error( error );
 }
 
 void mbedtlscpp::SSLConfig::authMode( AuthMode authMode )

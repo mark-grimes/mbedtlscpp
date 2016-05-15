@@ -13,6 +13,7 @@ namespace mbedtlscpp
 	class SSLContext;
 	class X509Crt;
 	class CtrDRBGContext;
+	class PKContext;
 }
 
 
@@ -46,6 +47,9 @@ namespace mbedtlscpp
 		SSLConfig& operator=( SSLConfig&& other ) = default;
 
 		void caChain( mbedtlscpp::X509Crt& certificateChain, mbedtls_x509_crl* pRevocationList );
+
+		void ownCert( mbedtlscpp::X509Crt& ownCertificate, mbedtlscpp::PKContext& privateKey, std::error_code& error );
+		void ownCert( mbedtlscpp::X509Crt& ownCertificate, mbedtlscpp::PKContext& privateKey );
 
 		void defaults( Endpoint endpoint, Transport transport, Preset preset, std::error_code& error );
 		void defaults( Endpoint endpoint, Transport transport, Preset preset );

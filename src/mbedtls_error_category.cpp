@@ -38,6 +38,9 @@ std::string mbedtlscpp::mbedtls_error_category::message( int code ) const
 	case MBEDTLS_ERR_SSL_WANT_READ :
 		return "MBEDTLS_ERR_SSL_WANT_READ";
 
+	case MBEDTLS_ERR_SSL_ALLOC_FAILED :
+		return "MBEDTLS_ERR_SSL_ALLOC_FAILED";
+
 	default :
 		return "Unknown error code ("+std::to_string(code)+")";
 	}
