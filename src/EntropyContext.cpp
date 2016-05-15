@@ -1,5 +1,4 @@
 #include "mbedtlscpp/EntropyContext.h"
-#include "mbedtlscpp/mbedtls_error_category.h"
 
 mbedtlscpp::EntropyContext::EntropyContext()
 {

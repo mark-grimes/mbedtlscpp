@@ -1,8 +1,6 @@
 #ifndef INCLUDEGUARD_mbedtlscpp_EntropyContext_h
 #define INCLUDEGUARD_mbedtlscpp_EntropyContext_h
 
-#include <string>
-#include <system_error>
 #include <mbedtls/entropy.h>
 //
 // Forward declarations
