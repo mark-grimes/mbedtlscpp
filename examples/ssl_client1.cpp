@@ -28,9 +28,9 @@
 #include "mbedtlscpp/NetContext.h"
 #include "mbedtlscpp/X509Crt.h"
 
-#define SERVER_PORT "443"
-#define SERVER_NAME "tls.mbed.org"
-//#define GET_REQUEST "GET / HTTP/1.1\r\nHost: tls.mbed.org\r\n\r\n"
+#define SERVER_PORT "4433"
+#define SERVER_NAME "localhost"
+//#define GET_REQUEST "GET / HTTP/1.1\r\nHost: SERVER_NAME\r\n\r\n"
 #define GET_REQUEST "GET / HTTP/1.0\r\n\r\n"
 
 #define DEBUG_LEVEL 1
@@ -98,7 +98,7 @@ int main( void )
 		config.dbg( my_debug, &std::cout );
 
 		sslContext.setup( config );
-		sslContext.setHostname( "tls.mbed.org" );
+		sslContext.setHostname( SERVER_NAME );
 		sslContext.setBIOEasyDefault( netContext );
 
 		/*
