@@ -17,7 +17,9 @@ namespace mbedtlscpp
 {
 	/** @brief Simple wrapper for mbedtls_x509_crt
 	 * @author Mark Grimes
-	 * @date 15/May/2016 */
+	 * @date 15/May/2016
+	 * @copyright Apache 2.0 licence (see http://www.apache.org/licenses/LICENSE-2.0)
+	 */
 	class X509Crt
 	{
 	public:

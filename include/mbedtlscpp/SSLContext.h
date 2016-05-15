@@ -18,7 +18,9 @@ namespace mbedtlscpp
 {
 	/** @brief Simple wrapper for mbedtls_ssl_context
 	 * @author Mark Grimes
-	 * @date 14/May/2016 */
+	 * @date 14/May/2016
+	 * @copyright Apache 2.0 licence (see http://www.apache.org/licenses/LICENSE-2.0)
+	 */
 	class SSLContext
 	{
 	public:

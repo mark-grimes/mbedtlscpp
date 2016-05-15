@@ -8,6 +8,7 @@ namespace mbedtlscpp
 	/** @brief error_category class for all errors resulting from mbed tls library calls
 	 * @author Mark Grimes
 	 * @date 14/May/2016
+	 * @copyright Apache 2.0 licence (see http://www.apache.org/licenses/LICENSE-2.0)
 	 */
 	class mbedtls_error_category : public std::error_category
 	{
