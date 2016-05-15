@@ -64,7 +64,7 @@ int main( void )
 		 * 0. Initialize the RNG and the session data
 		 */
 		std::cout << "\n  . Seeding the random number generator..." << std::flush;
-		randomNumberContext.setSeed( "ssl_client1", entropy );
+		randomNumberContext.seedEasyDefault( entropy, "ssl_client1" );
 		std::cout << " ok\n";
 
 		/*
