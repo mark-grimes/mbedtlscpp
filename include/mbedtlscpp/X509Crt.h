@@ -30,6 +30,9 @@ namespace mbedtlscpp
 		X509Crt( X509Crt&& other ) = default;
 		X509Crt& operator=( X509Crt&& other ) = default;
 
+		unsigned int parse( const char* buffer, size_t length, std::error_code& error );
+		unsigned int parse( const char* buffer, size_t length );
+
 		unsigned int parseFile( const std::string& filename, std::error_code& error );
 		unsigned int parseFile( const std::string& filename );
 

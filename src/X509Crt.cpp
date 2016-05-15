@@ -13,6 +13,25 @@ mbedtlscpp::X509Crt::~X509Crt()
 	mbedtls_x509_crt_free( &context_ );
 }
 
+unsigned int mbedtlscpp::X509Crt::parse( const char* buffer, size_t length, std::error_code& error )
+{
+	int result=mbedtls_x509_crt_parse( &context_, reinterpret_cast<const unsigned char*>(buffer), length );
+	if( result<0 )
+	{
+		error.assign( result, mbedtls_error_category::instance() );
+		return std::numeric_limits<unsigned int>::max(); // Don't know how many failed, so return this as an error value
+	}
+	return result;
+}
+
+unsigned int mbedtlscpp::X509Crt::parse( const char* buffer, size_t length )
+{
+	std::error_code error;
+	unsigned int failedCertificates=parse( buffer, length, error );
+	if( error ) throw std::system_error( error );
+	return failedCertificates;
+}
+
 unsigned int mbedtlscpp::X509Crt::parseFile( const std::string& filename, std::error_code& error )
 {
 	int result=mbedtls_x509_crt_parse_file( &context_, filename.c_str() );
