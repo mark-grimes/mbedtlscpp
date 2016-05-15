@@ -3,6 +3,7 @@
 #include "mbedtlscpp/X509Crt.h"
 #include "mbedtlscpp/PKContext.h"
 #include "mbedtlscpp/CtrDRBGContext.h"
+#include "mbedtlscpp/CacheContext.h"
 #include "mbedtlscpp/mbedtls_error_category.h"
 
 mbedtlscpp::SSLConfig::SSLConfig()
@@ -85,6 +86,18 @@ void mbedtlscpp::SSLConfig::rng( std::function<int(void*,unsigned char*,size_t)>
 void mbedtlscpp::SSLConfig::rngEasyDefault( CtrDRBGContext& ctrDrbgContext )
 {
 	rng( mbedtls_ctr_drbg_random, &ctrDrbgContext.context_ );
+}
+
+void mbedtlscpp::SSLConfig::sessionCache( void* parameter, std::function<int(void*,mbedtls_ssl_session*)> cacheGet, std::function<int(void*,const mbedtls_ssl_session*)> cacheSet )
+{
+	cacheGet_=cacheGet;
+	cacheSet_=cacheSet;
+	mbedtls_ssl_conf_session_cache( &context_, parameter, *cacheGet_.target<int(*)(void*,mbedtls_ssl_session*)>(), *cacheSet_.target<int(*)(void*,const mbedtls_ssl_session*)>() );
+}
+
+void mbedtlscpp::SSLConfig::sessionCacheEasyDefault( mbedtlscpp::CacheContext& cache )
+{
+	sessionCache( &cache.context_, mbedtls_ssl_cache_get, mbedtls_ssl_cache_set );
 }
 
 void mbedtlscpp::SSLConfig::dbg( std::function<void(void*,int,const char*,int,const char*)> debugCallback, void* parameter )

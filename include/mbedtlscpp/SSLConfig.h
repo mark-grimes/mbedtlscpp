@@ -14,6 +14,7 @@ namespace mbedtlscpp
 	class X509Crt;
 	class CtrDRBGContext;
 	class PKContext;
+	class CacheContext;
 }
 
 
@@ -60,6 +61,10 @@ namespace mbedtlscpp
 		/** @brief Convenience function that calls rng with the defaults required to use ctr_drbg generator. */
 		void rngEasyDefault( CtrDRBGContext& ctrDrbgContext );
 
+		void sessionCache( void* parameter, std::function<int(void*,mbedtls_ssl_session*)> cacheGet, std::function<int(void*,const mbedtls_ssl_session*)> cacheSet );
+		/** @brief Convenience function that calls sessionCache with the defaults required for the default cache. */
+		void sessionCacheEasyDefault( mbedtlscpp::CacheContext& cache );
+
 		void dbg( std::function<void(void*,int,const char*,int,const char*)> debugCallback, void* parameter );
 
 		mbedtls_ssl_config* get(){return &context_;} // TODO - remove this once I have a more OO way to use the class
@@ -68,6 +73,8 @@ namespace mbedtlscpp
 		mbedtls_ssl_config context_;
 		std::function<int(void*,unsigned char*,size_t)> randomNumberGenerator_;
 		std::function<void(void*,int,const char*,int,const char*)> debugCallback_;
+		std::function<int(void*,mbedtls_ssl_session*)> cacheGet_;
+		std::function<int(void*,const mbedtls_ssl_session*)> cacheSet_;
 	};
 
 } // end of namespace mbedtlscpp
