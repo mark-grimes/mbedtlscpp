@@ -1,6 +1,7 @@
 #include "mbedtlscpp/mbedtls_error_category.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/ssl.h"
+#include "mbedtls/net.h"
 
 
 const char* mbedtlscpp::mbedtls_error_category::name() const noexcept
@@ -20,6 +21,23 @@ std::string mbedtlscpp::mbedtls_error_category::message( int code ) const
 		return "MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY";
 	case MBEDTLS_ERR_X509_BUFFER_TOO_SMALL :
 		return "MBEDTLS_ERR_X509_BUFFER_TOO_SMALL";
+
+	// Errors for mbedtls_net_bind
+	case MBEDTLS_ERR_NET_SOCKET_FAILED :
+		return "MBEDTLS_ERR_NET_SOCKET_FAILED";
+	case MBEDTLS_ERR_NET_BIND_FAILED :
+		return "MBEDTLS_ERR_NET_BIND_FAILED";
+	case MBEDTLS_ERR_NET_LISTEN_FAILED :
+		return "MBEDTLS_ERR_NET_LISTEN_FAILED";
+
+	// Errors for mbedtls_net_accept
+	case MBEDTLS_ERR_NET_ACCEPT_FAILED :
+		return "MBEDTLS_ERR_NET_ACCEPT_FAILED";
+	case MBEDTLS_ERR_NET_BUFFER_TOO_SMALL :
+		return "MBEDTLS_ERR_NET_BUFFER_TOO_SMALL";
+	case MBEDTLS_ERR_SSL_WANT_READ :
+		return "MBEDTLS_ERR_SSL_WANT_READ";
+
 	default :
 		return "Unknown error code ("+std::to_string(code)+")";
 	}

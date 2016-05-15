@@ -35,6 +35,16 @@ namespace mbedtlscpp
 		void connect( const std::string& server, const std::string& port, Protocol protocol, std::error_code& error );
 		void connect( const std::string& server, const std::string& port, Protocol protocol );
 
+		void bind( const std::string& bindIP, const std::string& port, Protocol protocol, std::error_code& error );
+		void bind( const std::string& bindIP, const std::string& port, Protocol protocol );
+
+		void accept( mbedtlscpp::NetContext& clientContext, std::error_code& error );
+		void accept( mbedtlscpp::NetContext& clientContext );
+
+		void accept( mbedtlscpp::NetContext& clientContext, std::string& clientIPAddress, std::error_code& error );
+		void accept( mbedtlscpp::NetContext& clientContext, std::string& clientIPAddress );
+
+
 		mbedtls_net_context* get(){return &context_;} // TODO - remove this once I have a more OO way to use the class
 	protected:
 		friend class mbedtlscpp::SSLContext;
