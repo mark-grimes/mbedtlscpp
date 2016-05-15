@@ -68,6 +68,9 @@ namespace mbedtlscpp
 		size_t read( unsigned char* pBuffer, size_t length, std::error_code& error );
 		size_t read( unsigned char* pBuffer, size_t length );
 
+		void sessionReset( std::error_code& error );
+		void sessionReset();
+
 		void closeNotify( std::error_code& error );
 		void closeNotify();
 

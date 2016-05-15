@@ -152,6 +152,19 @@ size_t mbedtlscpp::SSLContext::read( unsigned char* pBuffer, size_t length )
 	return bytesRead;
 }
 
+void mbedtlscpp::SSLContext::sessionReset( std::error_code& error )
+{
+	int result=mbedtls_ssl_session_reset( &context_ );
+	if( result!=0 ) error.assign( result, mbedtls_error_category::instance() );
+}
+
+void mbedtlscpp::SSLContext::sessionReset()
+{
+	std::error_code error;
+	sessionReset( error );
+	if( error ) throw std::system_error( error );
+}
+
 void mbedtlscpp::SSLContext::closeNotify( std::error_code& error )
 {
 	int result;

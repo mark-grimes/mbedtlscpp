@@ -183,7 +183,7 @@ reset:
 
 	mbedtls_net_free( client.get() );
 
-	mbedtls_ssl_session_reset( sslContext.get() );
+	sslContext.sessionReset();
 
 	/*
 	 * 3. Wait until a client connects

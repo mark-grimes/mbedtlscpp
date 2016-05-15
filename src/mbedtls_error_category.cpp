@@ -41,6 +41,12 @@ std::string mbedtlscpp::mbedtls_error_category::message( int code ) const
 	case MBEDTLS_ERR_SSL_ALLOC_FAILED :
 		return "MBEDTLS_ERR_SSL_ALLOC_FAILED";
 
+	// Errors for mbedtls_ssl_session_reset
+	case MBEDTLS_ERR_SSL_HW_ACCEL_FAILED :
+		return "MBEDTLS_ERR_SSL_HW_ACCEL_FAILED";
+	case MBEDTLS_ERR_SSL_COMPRESSION_FAILED :
+		return "MBEDTLS_ERR_SSL_COMPRESSION_FAILED";
+
 	default :
 		return "Unknown error code ("+std::to_string(code)+")";
 	}
