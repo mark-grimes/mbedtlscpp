@@ -74,6 +74,8 @@ namespace mbedtlscpp
 		void closeNotify( std::error_code& error );
 		void closeNotify();
 
+		std::string getCipherSuite() const;
+
 		mbedtls_ssl_context* get(){return &context_;} // TODO - remove this once I have a more OO way to use the class
 	protected:
 		mbedtls_ssl_context context_;

@@ -247,8 +247,7 @@ reset:
 	 */
 	std::cout << "  > Write to client:" << std::flush;
 
-	len = sprintf( (char *) buf, HTTP_RESPONSE,
-	               mbedtls_ssl_get_ciphersuite( sslContext.get() ) );
+	len = sprintf( (char *) buf, HTTP_RESPONSE, sslContext.getCipherSuite().c_str() );
 
 	while( ( ret = mbedtls_ssl_write( sslContext.get(), buf, len ) ) <= 0 )
 	{

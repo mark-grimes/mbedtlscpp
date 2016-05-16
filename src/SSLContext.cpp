@@ -184,3 +184,8 @@ void mbedtlscpp::SSLContext::closeNotify()
 	closeNotify( error );
 	if( error ) throw std::system_error( error );
 }
+
+std::string mbedtlscpp::SSLContext::getCipherSuite() const
+{
+	return mbedtls_ssl_get_ciphersuite( &context_ );
+}
