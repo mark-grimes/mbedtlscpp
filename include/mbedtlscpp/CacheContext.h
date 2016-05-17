@@ -21,8 +21,8 @@ namespace mbedtlscpp
 	class CacheContext
 	{
 	public:
-		CacheContext();
-		virtual ~CacheContext();
+		CacheContext() { mbedtls_ssl_cache_init( &context_ ); }
+		virtual ~CacheContext() { mbedtls_ssl_cache_free( &context_ ); }
 		CacheContext( const CacheContext& other ) = delete;
 		CacheContext& operator=( const CacheContext& other ) = delete;
 		CacheContext( CacheContext&& other ) = default;

@@ -5,16 +5,17 @@
 #include <system_error>
 #include <functional>
 #include <mbedtls/ssl.h>
+#include "mbedtlscpp/X509Crt.h"
+#include "mbedtlscpp/PKContext.h"
+#include "mbedtlscpp/CtrDRBGContext.h"
+#include "mbedtlscpp/CacheContext.h"
+#include "mbedtlscpp/mbedtls_error_category.h"
 //
 // Forward declarations
 //
 namespace mbedtlscpp
 {
 	class SSLContext;
-	class X509Crt;
-	class CtrDRBGContext;
-	class PKContext;
-	class CacheContext;
 }
 
 
@@ -40,32 +41,100 @@ namespace mbedtlscpp
 		enum class Preset{ DEFAULT };
 		enum class AuthMode{ VERIFY_NONE, VERIFY_OPTIONAL, VERIFY_REQUIRED };
 	public:
-		SSLConfig();
-		virtual ~SSLConfig();
+		SSLConfig() { mbedtls_ssl_config_init( &context_ ); }
+		virtual ~SSLConfig() { mbedtls_ssl_config_free( &context_ ); }
 		SSLConfig( const SSLConfig& other ) = delete;
 		SSLConfig& operator=( const SSLConfig& other ) = delete;
 		SSLConfig( SSLConfig&& other ) = default;
 		SSLConfig& operator=( SSLConfig&& other ) = default;
 
-		void caChain( mbedtlscpp::X509Crt& certificateChain, mbedtls_x509_crl* pRevocationList );
+		void caChain( mbedtlscpp::X509Crt& certificateChain, mbedtls_x509_crl* pRevocationList )
+		{
+			mbedtls_ssl_conf_ca_chain( &context_, &certificateChain.context_, pRevocationList );
+		}
 
-		void ownCert( mbedtlscpp::X509Crt& ownCertificate, mbedtlscpp::PKContext& privateKey, std::error_code& error );
-		void ownCert( mbedtlscpp::X509Crt& ownCertificate, mbedtlscpp::PKContext& privateKey );
+		void ownCert( mbedtlscpp::X509Crt& ownCertificate, mbedtlscpp::PKContext& privateKey, std::error_code& error )
+		{
+			int result=mbedtls_ssl_conf_own_cert( &context_, &ownCertificate.context_, &privateKey.context_ );
+			if( result!=0 ) error.assign( result, mbedtls_error_category::instance() );
+		}
+		void ownCert( mbedtlscpp::X509Crt& ownCertificate, mbedtlscpp::PKContext& privateKey )
+		{
+			std::error_code error;
+			ownCert( ownCertificate, privateKey, error );
+			if( error ) throw std::system_error( error );
+		}
 
-		void defaults( Endpoint endpoint, Transport transport, Preset preset, std::error_code& error );
-		void defaults( Endpoint endpoint, Transport transport, Preset preset );
+		void defaults( Endpoint endpoint, Transport transport, Preset preset, std::error_code& error )
+		{
+			int end, trans, pre;
+			switch( endpoint )
+			{
+				case Endpoint::CLIENT : end=MBEDTLS_SSL_IS_CLIENT; break;
+				case Endpoint::SERVER : end=MBEDTLS_SSL_IS_SERVER; break;
+			}
+			switch( transport )
+			{
+				case Transport::STREAM : trans=MBEDTLS_SSL_TRANSPORT_STREAM; break;
+				case Transport::DATAGRAM : trans=MBEDTLS_SSL_TRANSPORT_DATAGRAM; break;
+			}
+			switch( preset )
+			{
+				case Preset::DEFAULT : pre=MBEDTLS_SSL_PRESET_DEFAULT; break;
+				default :
+					throw std::runtime_error( "mbedtlscpp::SSLConfig::defaults not coded that Preset value yet" );
+			}
 
-		void authMode( AuthMode authMode );
+			int result=mbedtls_ssl_config_defaults( &context_, end, trans, pre );
+			if( result!=0 ) error.assign( result, mbedtls_error_category::instance() );
+		}
+		void defaults( Endpoint endpoint, Transport transport, Preset preset )
+		{
+			std::error_code error;
+			defaults( endpoint, transport, preset, error );
+			if( error ) throw std::system_error( error );
+		}
 
-		void rng( std::function<int(void*,unsigned char*,size_t)> generator, void* parameter );
+		void authMode( AuthMode authMode )
+		{
+			int mode;
+			switch( authMode )
+			{
+			case AuthMode::VERIFY_NONE : mode=MBEDTLS_SSL_VERIFY_NONE; break;
+			case AuthMode::VERIFY_OPTIONAL : mode=MBEDTLS_SSL_VERIFY_OPTIONAL; break;
+			case AuthMode::VERIFY_REQUIRED : mode=MBEDTLS_SSL_VERIFY_REQUIRED; break;
+			}
+			mbedtls_ssl_conf_authmode( &context_, mode );
+		}
+
+		void rng( std::function<int(void*,unsigned char*,size_t)> generator, void* parameter )
+		{
+			randomNumberGenerator_=generator;
+			mbedtls_ssl_conf_rng( &context_, *randomNumberGenerator_.target<int(*)(void*,unsigned char*,size_t)>(), parameter );
+		}
 		/** @brief Convenience function that calls rng with the defaults required to use ctr_drbg generator. */
-		void rngEasyDefault( CtrDRBGContext& ctrDrbgContext );
+		void rngEasyDefault( CtrDRBGContext& ctrDrbgContext )
+		{
+			rng( mbedtls_ctr_drbg_random, &ctrDrbgContext.context_ );
+		}
 
-		void sessionCache( void* parameter, std::function<int(void*,mbedtls_ssl_session*)> cacheGet, std::function<int(void*,const mbedtls_ssl_session*)> cacheSet );
+		void sessionCache( void* parameter, std::function<int(void*,mbedtls_ssl_session*)> cacheGet, std::function<int(void*,const mbedtls_ssl_session*)> cacheSet )
+		{
+			cacheGet_=cacheGet;
+			cacheSet_=cacheSet;
+			mbedtls_ssl_conf_session_cache( &context_, parameter, *cacheGet_.target<int(*)(void*,mbedtls_ssl_session*)>(), *cacheSet_.target<int(*)(void*,const mbedtls_ssl_session*)>() );
+		}
 		/** @brief Convenience function that calls sessionCache with the defaults required for the default cache. */
-		void sessionCacheEasyDefault( mbedtlscpp::CacheContext& cache );
+		void sessionCacheEasyDefault( mbedtlscpp::CacheContext& cache )
+		{
+			sessionCache( &cache.context_, mbedtls_ssl_cache_get, mbedtls_ssl_cache_set );
+		}
 
-		void dbg( std::function<void(void*,int,const char*,int,const char*)> debugCallback, void* parameter );
+		void dbg( std::function<void(void*,int,const char*,int,const char*)> debugCallback, void* parameter )
+		{
+			debugCallback_=debugCallback;
+			mbedtls_ssl_conf_dbg( &context_, *debugCallback_.target<void(*)(void*,int,const char*,int,const char*)>(), parameter );
+		}
 
 		mbedtls_ssl_config* get(){return &context_;} // TODO - remove this once I have a more OO way to use the class
 	protected:

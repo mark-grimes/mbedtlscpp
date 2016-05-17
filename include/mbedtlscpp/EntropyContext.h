@@ -21,8 +21,8 @@ namespace mbedtlscpp
 	class EntropyContext
 	{
 	public:
-		EntropyContext();
-		virtual ~EntropyContext();
+		EntropyContext() { mbedtls_entropy_init( &context_ ); }
+		virtual ~EntropyContext() { mbedtls_entropy_free( &context_ ); }
 		EntropyContext( const EntropyContext& other ) = delete;
 		EntropyContext& operator=( const EntropyContext& other ) = delete;
 		EntropyContext( EntropyContext&& other ) = default;
